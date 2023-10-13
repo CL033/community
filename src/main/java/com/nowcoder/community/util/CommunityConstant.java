@@ -13,4 +13,12 @@ public interface CommunityConstant {
      * 激活失败
      */
     int ACTIVATION_FAILURE=2;
+    /**
+     * 默认有效时间
+     */
+    int DEFAULT_EXPIRED_TIME = 3600*12;
+    /**
+     * 记住状态下的有效时间
+     */
+    int REMENBERME_EXPIRED_TIME = 3600*12*100;
 }

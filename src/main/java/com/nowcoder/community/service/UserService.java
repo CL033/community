@@ -173,7 +173,23 @@ public class UserService implements CommunityConstant {
         loginTicketMapper.updateStatus(ticket,1);
     }
 
+    /**
+     * 查找登录凭证
+     * @param ticket
+     * @return
+     */
     public LoginTicket findLoginTicket(String ticket){
         return loginTicketMapper.selectByTicket(ticket);
     }
+
+    /**
+     * 修改用户头像
+     * @param userId
+     * @param headerUrl
+     * @return
+     */
+    public int updateHeader(int userId,String headerUrl){
+        return userMapper.updateHeader(userId, headerUrl);
+    }
+
 }

@@ -192,4 +192,14 @@ public class UserService implements CommunityConstant {
         return userMapper.updateHeader(userId, headerUrl);
     }
 
+    /**
+     * 修改用户登录密码
+     * @param userId
+     * @param password
+     * @return
+     */
+    public int updatePassword(int userId,String password){
+        return userMapper.updatePassword(userId, password);
+    }
+
 }

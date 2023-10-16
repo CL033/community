@@ -111,4 +111,13 @@ public class MapperTests {
         int abc = loginTicketMapper.updateStatus("abc", 1);
         System.out.println(abc);
     }
+
+    /**
+     * 测试修改密码
+     */
+    @Test
+    public void testUpdatePassword(){
+        int abc = userMapper.updatePassword(154,CommunityUtil.md5("456"+"2cfda"));
+        System.out.println(abc);
+    }
 }

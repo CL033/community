@@ -120,4 +120,19 @@ public class MapperTests {
         int abc = userMapper.updatePassword(154,CommunityUtil.md5("456"+"2cfda"));
         System.out.println(abc);
     }
+
+    @Test
+    public void testInsertDiscussPost(){
+        DiscussPost discussPost = new DiscussPost();
+        discussPost.setTitle("111");
+        discussPost.setContent("222");
+        discussPost.setUserId(151);
+        discussPost.setCreateTime(new Date());
+        discussPostMapper.insertDiscussPost(discussPost);
+    }
+
+    @Test
+    public void testSelectDiscussPost(){
+        System.out.println(discussPostMapper.findDiscussPostByID(283));
+    }
 }

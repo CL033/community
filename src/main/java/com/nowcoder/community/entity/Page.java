@@ -12,13 +12,14 @@ public class Page {
     // 当前页码
     @Getter
     private int current = 1;
-    //显示上线
+
+    //显示上限
     @Getter
     private int limit = 10;
-    // 数据综述（用于计算总页数）
-
+    // 数据总数（用于计算总页数）
     @Getter
     private int rows;
+
     //查询路径(复用分页链接)
     @Setter
     @Getter

@@ -21,4 +21,12 @@ public interface CommunityConstant {
      * 记住状态下的有效时间
      */
     int REMENBERME_EXPIRED_TIME = 3600*12*100;
+    /**
+     * 实体类型：帖子
+     */
+    int ENTITY_TYPE_POST = 1;
+    /**
+     * 实体类型：评论
+     */
+    int ENTITY_TYPE_COMMENT = 2;
 }

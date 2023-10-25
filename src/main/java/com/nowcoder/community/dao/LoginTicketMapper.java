@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
+@Deprecated
 public interface LoginTicketMapper {
 
     int insertLoginTicket(LoginTicket loginTicket);

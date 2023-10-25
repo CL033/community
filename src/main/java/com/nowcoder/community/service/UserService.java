@@ -7,9 +7,11 @@ import com.nowcoder.community.entity.User;
 import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.MailClient;
+import com.nowcoder.community.util.RedisKeyUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -18,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService implements CommunityConstant {
@@ -25,8 +28,8 @@ public class UserService implements CommunityConstant {
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private LoginTicketMapper loginTicketMapper;
+//    @Autowired
+//    private LoginTicketMapper loginTicketMapper;
 
     @Autowired
     private MailClient mailClient;
@@ -40,13 +43,19 @@ public class UserService implements CommunityConstant {
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 查询用户
      * @param id
      * @return
      */
     public User findUserById(int id){
-        return userMapper.selectById(id);
+        User user = getCache(id);
+        if(user ==null){
+            user = initCache(id);
+        }
+        return user;
     }
 
     /**
@@ -120,6 +129,7 @@ public class UserService implements CommunityConstant {
             return ACTIVATION_REPEAT;
         } else if (user.getActivationCode().equals(code)) {
             userMapper.updateStatus(id,1);
+            clearCache(id);
             return ACTIVATION_SUCCESS;
         }else return ACTIVATION_FAILURE;
     }
@@ -161,7 +171,9 @@ public class UserService implements CommunityConstant {
         loginTicket.setTicket(CommunityUtil.generateUUID());
         loginTicket.setStatus(0);
         loginTicket.setExpired(new Date(System.currentTimeMillis()+expiredSeconds*1000));
-        loginTicketMapper.insertLoginTicket(loginTicket);
+        String ticketKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
+        redisTemplate.opsForValue().set(ticketKey,loginTicket);
+//        loginTicketMapper.insertLoginTicket(loginTicket);
         map.put("ticket",loginTicket.getTicket());
         return map;
     }
@@ -170,7 +182,11 @@ public class UserService implements CommunityConstant {
      * 退出登录
      */
     public void logout(String ticket){
-        loginTicketMapper.updateStatus(ticket,1);
+        String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+        LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(ticketKey);
+        loginTicket.setStatus(1);
+        redisTemplate.opsForValue().set(ticketKey,loginTicket);
+        //loginTicketMapper.updateStatus(ticket,1);
     }
 
     /**
@@ -179,7 +195,9 @@ public class UserService implements CommunityConstant {
      * @return
      */
     public LoginTicket findLoginTicket(String ticket){
-        return loginTicketMapper.selectByTicket(ticket);
+        String ticketKey = RedisKeyUtil.getTicketKey(ticket);
+        return  (LoginTicket) redisTemplate.opsForValue().get(ticketKey);
+//        return loginTicketMapper.selectByTicket(ticket);
     }
 
     /**
@@ -189,7 +207,9 @@ public class UserService implements CommunityConstant {
      * @return
      */
     public int updateHeader(int userId,String headerUrl){
-        return userMapper.updateHeader(userId, headerUrl);
+        int row = userMapper.updateHeader(userId, headerUrl);
+        clearCache(userId);
+        return row;
     }
 
     /**
@@ -199,11 +219,30 @@ public class UserService implements CommunityConstant {
      * @return
      */
     public int updatePassword(int userId,String password){
-        return userMapper.updatePassword(userId, password);
+        int row = userMapper.updatePassword(userId, password);
+        clearCache(userId);
+        return row;
     }
 
     public User findUser(String username){
         return userMapper.selectByName(username);
     }
 
+    //1. 优先从缓存中取值
+    private User getCache(int userId){
+        String userKey =RedisKeyUtil.getUserKey(userId);
+        return (User) redisTemplate.opsForValue().get(userKey);
+    }
+    //2. 取不到值就初始化缓存数据
+    private User initCache(int userId){
+        User user =userMapper.selectById(userId);
+        String userKey =RedisKeyUtil.getUserKey(userId);
+        redisTemplate.opsForValue().set(userKey,user,3600, TimeUnit.SECONDS);
+        return user;
+    }
+    //3. 数据更新时清理缓存数据
+    private void clearCache(int userId){
+        String userKey =RedisKeyUtil.getUserKey(userId);
+        redisTemplate.delete(userKey);
+    }
 }

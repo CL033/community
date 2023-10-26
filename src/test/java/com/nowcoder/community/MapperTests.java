@@ -171,4 +171,13 @@ public class MapperTests {
         count = messageMapper.selectLetterUnreadCount(131,"111_131");
         System.out.println(count);
     }
+
+    @Test
+    public void testFindNotices(){
+        List<Message> follow = messageMapper.selectNotices(111, "follow", 5, 10);
+        for(Message message : follow){
+            System.out.println(message);
+        }
+
+    }
 }

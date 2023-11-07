@@ -1,9 +1,6 @@
 package com.nowcoder.community.config;
 
-import com.nowcoder.community.controller.Interceptor.AlphaInterceptor;
-import com.nowcoder.community.controller.Interceptor.LoginRequiredInterceptor;
-import com.nowcoder.community.controller.Interceptor.LoginTicketInterceptor;
-import com.nowcoder.community.controller.Interceptor.MessageInterceptor;
+import com.nowcoder.community.controller.Interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -22,6 +19,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //    private LoginRequiredInterceptor loginRequiredInterceptor;
     @Autowired
     private MessageInterceptor messageInterceptor;
+    @Autowired
+    private DataInterceptor dataInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -33,6 +32,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //        registry.addInterceptor(loginRequiredInterceptor)
 //                .excludePathPatterns("/**/*.css","/**/*.jpg","/**/*.png","/**/*.jepg");
         registry.addInterceptor(messageInterceptor)
+                .excludePathPatterns("/**/*.css","/**/*.jpg","/**/*.png","/**/*.jepg");
+        registry.addInterceptor(dataInterceptor)
                 .excludePathPatterns("/**/*.css","/**/*.jpg","/**/*.png","/**/*.jepg");
     }
 }

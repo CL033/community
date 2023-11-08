@@ -5,7 +5,11 @@ import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.DiscussPost;
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.util.CommunityUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -21,6 +25,8 @@ import java.util.Date;
 
 @Service
 public class AlphaService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AlphaService.class);
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -87,5 +93,15 @@ public class AlphaService {
                 return "Ok";
             }
         });
+    }
+
+    //让该方法在多线程的环境下被异步调用
+    @Async
+    public void excute1(){
+        logger.debug("Hello excute1");
+    }
+    @Scheduled(initialDelay = 10000,fixedRate = 1000)
+    public void excute2(){
+        logger.debug("Hello excute2");
     }
 }

@@ -96,12 +96,12 @@ public class AlphaService {
     }
 
     //让该方法在多线程的环境下被异步调用
-    @Async
-    public void excute1(){
-        logger.debug("Hello excute1");
-    }
-    @Scheduled(initialDelay = 10000,fixedRate = 1000)
-    public void excute2(){
-        logger.debug("Hello excute2");
-    }
+//    @Async
+//    public void excute1(){
+//        logger.debug("Hello excute1");
+//    }
+//    @Scheduled(initialDelay = 10000,fixedRate = 1000)
+//    public void excute2(){
+//        logger.debug("Hello excute2");
+//    }
 }
